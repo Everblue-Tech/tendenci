@@ -1025,9 +1025,9 @@ def add_tendenci_footer(email_content, content_type='html'):
     <img src="https://www.tendenci.com/media/tendenci-os-ams.jpg" width="100" height="29" alt="tendenci logo" />
     </a>
     </div>'''.format(_('This Association is Powered by'), _('Tendenci &ndash; The Open Source AMS'))
-    if email_content.find('</body>') != -1:
-        return email_content.replace("</body>", footer + "\n</body>")
-    return email_content + footer
+    # if email_content.find('</body>') != -1:
+    #     return email_content.replace("</body>", footer + "\n</body>")
+    return email_content
 
 
 def correct_filename(filename):
