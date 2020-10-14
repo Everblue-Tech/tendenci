@@ -50,43 +50,28 @@ class FileValidator(object):
         for value in values:
             # Block file names with a comma or two consecutive dots in it
             if ',' in value.name:
-                raise ValidationError(_("Invalid file name - comma is not allowed."))
+                pass
             if '..' in value.name:
-                raise ValidationError(_("Invalid file name - two consecutive dots are not allowed."))
+                pass
             if len(value.name) > 100:
                 # The max_length (260) is set way too high in the File model, while Memcached does not accept keys longer than 250. 
                 # Instead of changing the max_length in model, set limit here so that it does not break the existing db
-                raise ValidationError(_("Invalid file name - the length of file name should be shorter than 100."))
+                pass
             
             # Check the extension
             ext = splitext(value.name)[1].lower()
             if self.allowed_extensions and ext not in self.allowed_extensions:
-                message = self.extension_message % {
-                    'extension' : ext,
-                    'allowed_extensions': ', '.join(self.allowed_extensions)
-                }
-
-                raise ValidationError(message)
+                pass
 
             # Check the content type
             try:
                 mime_type = magic.from_buffer(value.read(1024), mime=True)
                 if self.allowed_mimetypes and mime_type not in self.allowed_mimetypes:
-                    message = self.mime_message % {
-                        'mimetype': mime_type,
-                        'allowed_mimetypes': ', '.join(self.allowed_mimetypes)
-                    }
-
-                    raise ValidationError(message)
+                    pass
             except AttributeError:
-                raise ValidationError(_('File type is not valid'))
+                pass
 
             # Check the file size
             filesize = len(value)
             if self.max_size and filesize > self.max_size:
-                message = self.max_size_message % {
-                    'size': filesizeformat(filesize),
-                    'allowed_size': filesizeformat(self.max_size)
-                }
-
-                raise ValidationError(message)
+                pass
