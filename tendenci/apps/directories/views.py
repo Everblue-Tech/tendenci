@@ -24,7 +24,7 @@ from tendenci.apps.base.http import Http403
 from tendenci.apps.base.views import file_display
 from tendenci.apps.perms.decorators import is_enabled
 from tendenci.apps.perms.utils import (get_notice_recipients,
-    has_perm, has_view_perm, get_query_filters, update_perms_and_save)
+    has_perm, has_view_perm, get_query_filters, update_perms_and_save, assign_files_perms)
 from tendenci.apps.event_logs.models import EventLog
 from tendenci.apps.meta.models import Meta as MetaTags
 from tendenci.apps.meta.forms import MetaForm
@@ -36,7 +36,6 @@ from tendenci.apps.directories.forms import (DirectoryForm, DirectoryPricingForm
                                                DirectoryRenewForm, DirectoryExportForm)
 from tendenci.apps.directories.utils import directory_set_inv_payment, is_free_listing
 from tendenci.apps.notifications import models as notification
-from tendenci.apps.base.utils import send_email_notification
 from tendenci.apps.directories.forms import DirectorySearchForm
 
 
@@ -76,7 +75,8 @@ def search(request, template_name="directories/search.html"):
         sub_cat = form.cleaned_data.get('sub_cat')
         region = form.cleaned_data.get('region')
         cat = [int(c) for c in cat if c.isdigit()]
-        sub_cat = [int(c) for c in sub_cat if c.isdigit()]
+        if sub_cat:
+            sub_cat = [int(c) for c in sub_cat if c.isdigit()]
 
         if cat:
             directories = directories.filter(cats__in=list(cat))
@@ -528,18 +528,16 @@ def approve(request, id, template_name="directories/approve.html"):
             directory.owner_username = request.user.username
 
         directory.save()
+        # assign files permissions
+        assign_files_perms(directory)
 
         # send email notification to user
-        recipients = [directory.creator.email]
+        recipients = directory.get_owner_emails_list()
         if recipients:
-            extra_context = {
-                'object': directory,
-                'request': request,
-            }
-            try:
-                send_email_notification('directory_approved_user_notice', recipients, extra_context)
-            except:
-                pass
+            notification.send_emails(recipients, 
+                'directory_approved_user_notice', {
+                        'object': directory,
+                        'request': request,})
 
         msg_string = 'Successfully approved %s' % directory
         messages.add_message(request, messages.SUCCESS, _(msg_string))

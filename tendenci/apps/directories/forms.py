@@ -24,6 +24,7 @@ from tendenci.apps.directories.choices import (DURATION_CHOICES, ADMIN_DURATION_
 from tendenci.apps.base.fields import EmailVerificationField, CountrySelectField, PriceField
 from tendenci.apps.files.utils import get_max_file_upload_size
 from tendenci.apps.regions.models import Region
+from tendenci.apps.site_settings.utils import get_setting
 
 
 ALLOWED_LOGO_EXT = (
@@ -94,6 +95,9 @@ class DirectorySearchForm(FormControlWidgetMixin, forms.Form):
         if not Directory.objects.filter(region__isnull=False).exists():
             del self.fields['region']
 
+        if 'sub_cat' in self.fields and get_setting('module', 'directories', 'disablesubcategories'):
+            self.fields.pop('sub_cat')
+
     def clean(self):
         cleaned_data = self.cleaned_data
         q = self.cleaned_data.get('q', None)
@@ -132,15 +136,16 @@ def _get_sub_cats_choices(directory=None, empty_label=None):
     else:
         choices = []
     cats = DirectoryCategory.objects.filter(parent=None)
-    if directory:
-        cats = cats.filter(id__in=directory.cats.all())
-    for cat in cats:
-        my_choices = []
-        sub_cats = DirectoryCategory.objects.filter(parent=cat)
-        for sub_cat in sub_cats:
-            my_choices.append((sub_cat.id, sub_cat.name))
-        if my_choices:
-            choices.append((cat.name, my_choices))
+    if cats.exists():
+        if directory and directory.id:
+            cats = cats.filter(id__in=directory.cats.all())
+        for cat in cats:
+            my_choices = []
+            sub_cats = DirectoryCategory.objects.filter(parent=cat)
+            for sub_cat in sub_cats:
+                my_choices.append((sub_cat.id, sub_cat.name))
+            if my_choices:
+                choices.append((cat.name, my_choices))
     return choices
 
 
@@ -369,6 +374,16 @@ class DirectoryForm(TendenciBaseForm):
         for f in list(set(fields_to_pop)):
             if f in self.fields:
                 self.fields.pop(f)
+
+        if 'sub_cats' in self.fields and get_setting('module', 'directories', 'disablesubcategories'):
+            self.fields.pop('sub_cats')
+
+        if 'sub_cats' not in self.fields:
+            if self.user.profile.is_superuser:
+                self.fields['cats'].help_text += mark_safe('<br /><a href="{0}">{1}</a>'.format(
+                            reverse('admin:directories_category_changelist'),
+                            _('Manage Categories'),))
+            
 
     def clean_syndicate(self):
         """
