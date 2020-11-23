@@ -1,8 +1,12 @@
 {% load base_tags %}
 {% load perm_tags %}
 
-{% has_perm user directories.change_directory opt_object as can_edit %}
+{% has_perm user directories.change_directory opt_object as has_edit_dir_perm %}
+{% opt_object.has_membership_with(user) as user_member_directory %}
+{% has_edit_dir_perm or user_member_directory as can_edit %}
+
 {% has_perm user directories.delete_directory opt_object as can_delete %}
+
 
 <div class="t-iconrow">
 
