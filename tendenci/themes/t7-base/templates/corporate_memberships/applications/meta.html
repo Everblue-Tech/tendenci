@@ -77,9 +77,6 @@
 								{% endif %}
 
 								{% if corporate_membership.is_active and not corporate_membership.is_expired %}
-                                <li>
-                                    <a href="{% url 'membership_default.add_under_corp' corporate_membership.id %}">{% trans "Join Corporation" %}</a>
-                                </li> 
 	                                {% if user.profile.is_superuser %}
 	                                <li>
 	                                    <a href="{% url 'corpmembership.upgrade' corporate_membership.id %}">{% trans "Upgrade" %}</a>

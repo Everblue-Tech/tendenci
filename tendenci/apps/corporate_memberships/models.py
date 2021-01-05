@@ -148,7 +148,7 @@ class CorporateMembershipType(OrderingBaseModel, TendenciBaseModel):
     number_passes = models.PositiveIntegerField(_('Number Passes'),
                                                default=0,
                                                blank=True)
-    require_approval = models.CharField(_('Require Approval'), 
+    require_approval = models.CharField(_('Require Approval'),
                                         choices=REQUIRE_APPROVAL_CHOICES,
                                         default='for_non_paid_only',
                                         max_length=20)
@@ -755,7 +755,7 @@ class CorpMembership(TendenciBaseModel):
                         params['create_new'] = False
                     else:
                         params['create_new'] = True
-    
+
                 self.approve_join(request, **params)
 
         # send notification to administrators
@@ -955,7 +955,7 @@ class CorpMembership(TendenciBaseModel):
                 self.owner = request_user
                 self.owner_username = request_user.username
             self.save()
-            
+
             # directory
             if self.corp_profile.directory:
                 directory = self.corp_profile.directory
@@ -1111,7 +1111,7 @@ class CorpMembership(TendenciBaseModel):
             self.owner = assign_to_user
             self.owner_username = assign_to_user.username
             self.save()
-            
+
             self.corp_profile.creator = self.creator
             self.corp_profile.creator_username = self.creator_username
             self.corp_profile.owner = self.owner
@@ -1191,7 +1191,7 @@ class CorpMembership(TendenciBaseModel):
                 if this_user.id == self.owner.id:
                     return True
 
-        # if they can approve, they can edit the pending corporate membership             
+        # if they can approve, they can edit the pending corporate membership
         if self.is_pending and has_perm(this_user, 'corporate_memberships.approve_corpmembership'):
             return True
 
@@ -1526,7 +1526,7 @@ class CorpMembershipApp(TendenciBaseModel):
         name = kwargs.get('name')
         if Group.objects.filter(name=name).exists():
             return Group.objects.get(name=name)
-        
+
         return Group.objects.create(
                     name=name,
                     label=name,
@@ -2065,7 +2065,7 @@ class Notice(models.Model):
                                      corporate_membership.invoice.get_absolute_url())
         else:
             invoice_link = ''
-            
+
         if corporate_membership.corp_profile.directory:
             directory_url = '{0}{1}'.format(site_url, reverse('directory',
                                     args=[corporate_membership.corp_profile.directory.slug]))

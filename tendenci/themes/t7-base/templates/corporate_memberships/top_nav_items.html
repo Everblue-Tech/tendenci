@@ -61,13 +61,6 @@
                             <a href="{% url 'corpmembership.add' %}">{% trans "Add Corporate Member" %}</a>
                         </span>
                     </li>
-                    
-                    <li class="content-item">
-                        <span class="app-name">
-                            <a href="{% url 'membership_default.corp_pre_add' %}">{% trans "Add an Individual Corporate Member" %}</a>
-                        </span>
-                    </li>
-
 					{% if can_approve_corpmemb %}
                         <li class="content-item">
                             <span class="app-name">

@@ -417,7 +417,7 @@
             </div>
             {% endif %}
 
-            {% if membership.admin_notes %}
+            {% if membership.admin_notes and user.is_superuser %}
             <div class="field">
                 <div class="label label-info">{% trans 'Admin Notes' %}</div>
                 <div class="value">{{ membership.admin_notes|linebreaks }}</div>

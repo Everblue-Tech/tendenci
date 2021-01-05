@@ -57,7 +57,7 @@ class Directory(TendenciBaseModel):
     entity = models.OneToOneField(Entity, blank=True, null=True,
                                   on_delete=models.SET_NULL,)
     timezone = TimeZoneField(verbose_name=_('Time Zone'), default='US/Central', choices=get_timezone_choices(), max_length=100)
-    headline = models.CharField(_('Name'), max_length=200, blank=True)
+    headline = models.CharField(_('Public Company Name'), max_length=200, blank=True)
     summary = models.TextField(blank=True)
     body = tinymce_models.HTMLField(_('Description'))
     source = models.CharField(max_length=300, blank=True)
@@ -91,7 +91,7 @@ class Directory(TendenciBaseModel):
     expiration_dt = models.DateTimeField(_('Expiration Date/Time'), null=True, blank=True)
     invoice = models.ForeignKey(Invoice, blank=True, null=True, on_delete=models.CASCADE)
     payment_method = models.CharField(_('Payment Method'), max_length=50, blank=True)
-    
+
     # social media links
     linkedin = models.URLField(_('LinkedIn'), blank=True, default='')
     facebook = models.URLField(_('Facebook'), blank=True, default='')
@@ -248,7 +248,7 @@ class Directory(TendenciBaseModel):
 
     def age(self):
         return datetime.now() - self.create_dt
-    
+
     def cats_list(self):
         items = []
         for cat in self.cats.all():
@@ -273,12 +273,12 @@ class Directory(TendenciBaseModel):
             return True
         else:
             return False
-        
+
     def has_membership_with(self, this_user):
         """
         Check if this directory is associated with a membership or a corporate membership
-        that this user owns. 
-        
+        that this user owns.
+
         Return ``True`` if this directory is associated with an active membership
         or corporate membership, and this_user owns the membership or is a representative
         of the corporate membership, or is the ``creator`` or ``owner`` of this directory.
@@ -302,10 +302,10 @@ class Directory(TendenciBaseModel):
     def get_owner_emails_list(self):
         """
         Returns a list of owner's email addresses.
-        
-        It's tricky because directory doesn't have a clear owner. 
+
+        It's tricky because directory doesn't have a clear owner.
         Since the owner field can be changed to whoever last edited, we'll
-        check the creator, the email address field, member or reps if 
+        check the creator, the email address field, member or reps if
         it is created from memberships and corp memberships, respectively.
         """
         emails_list = []
@@ -313,7 +313,7 @@ class Directory(TendenciBaseModel):
         if self.creator and validate_email(self.creator.email):
             emails_list.append(self.creator.email)
 
-        # the email field  
+        # the email field
         if validate_email(self.email):
             emails_list.append(self.email)
 
